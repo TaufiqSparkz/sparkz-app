@@ -68,27 +68,29 @@ export default function FireRescueAI() {
     setMessages(prev => [...prev, { role: "user", content: userMessage, category: cat }]);
     setLoading(true);
 
-    try {
-      const history = messages.map(m => ({
-        role: m.role,
-        content: m.role === "user" ? `[Category: ${m.category?.label}]\n\n${m.content}` : m.content,
-      }));
+     try {
+  const history = messages.map(m => ({
+    role: m.role,
+    content: m.role === "user" ? `[Category: ${m.category?.label}]\n\n${m.content}` : m.content,
+  }));
 
-      const response = await fetch("/api.chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: "claude-sonnet-4-20250514",
-          max_tokens: 1000,
-          system: SYSTEM_PROMPT,
-          messages: [...history, { role: "user", content: fullPrompt }],
-        }),
-      });
+  const response = await fetch("/.netlify/functions/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 1000,
+      system: SYSTEM_PROMPT,
+      messages: [...history, { role: "user", content: fullPrompt }],
+    }),
+  });
 
-      const data = await response.json();
-      const text = data.content?.map(b => b.text || "").join("") || "No response received.";
-      setMessages(prev => [...prev, { role: "assistant", content: text }]);
-    } catch (err) {
+  const rawText = await response.text();
+  if (!rawText) throw new Error("Empty response from server");
+  const data = JSON.parse(rawText);
+  const text = data.content?.map(b => b.text || "").join("") || JSON.stringify(data);
+  setMessages(prev => [...prev, { role: "assistant", content: text }]);
+} catch (err) {
   setMessages(prev => [...prev, { role: "assistant", content: `⚠️ Error: ${err.message}` }]);
 } finally {
       setLoading(false);
@@ -121,7 +123,7 @@ export default function FireRescueAI() {
       fontFamily: "'Courier New', Courier, monospace",
       color: "#E2E8F0",
       display: "flex",
-      flexDirection: "column",
+      fltryexDirection: "column",
       position: "relative",
       overflow: "hidden",
     }}>
