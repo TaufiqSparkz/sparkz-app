@@ -1,8 +1,8 @@
 {
-  "functions": {
-    "api/chat.js": {
-      "memory": 512,
-      "maxDuration": 30
-    }
-  }
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "rewrites": [
+    { "source": "/api/chat", "destination": "/api/chat" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
 }
