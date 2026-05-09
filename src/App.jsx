@@ -118,33 +118,16 @@ export default function FireRescueAI() {
 
   return (
     <div style={{
-      minHeight: "100vh",
-      background: "#0A0A0F",
-      fontFamily: "'Courier New', Courier, monospace",
-      color: "#E2E8F0",
-      display: "flex",
-      fltryexDirection: "column",
-      position: "relative",
-      overflow: "hidden",
-    }}>
-      {/* Scanline effect */}
-      <div style={{
-        position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
-        background: `linear-gradient(transparent ${scanLine}%, rgba(255,69,0,0.015) ${scanLine + 1}%, transparent ${scanLine + 2}%)`,
-        pointerEvents: "none", zIndex: 999,
-      }} />
-
-      {/* Grid background */}
-      <div style={{
-        position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
-        backgroundImage: `
-          linear-gradient(rgba(255,69,0,0.04) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(255,69,0,0.04) 1px, transparent 1px)
-        `,
-        backgroundSize: "40px 40px",
-        pointerEvents: "none",
-      }} />
-
+  height: "100vh",
+  background: "#0A0A0F",
+  fontFamily: "'Courier New', Courier, monospace",
+  color: "#E2E8F0",
+  display: "flex",
+  flexDirection: "column",
+  position: "relative",
+  overflow: "hidden",
+}}>
+          
       {/* Header */}
       <div style={{
         borderBottom: "1px solid #FF4500",
