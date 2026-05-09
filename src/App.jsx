@@ -89,8 +89,8 @@ export default function FireRescueAI() {
       const text = data.content?.map(b => b.text || "").join("") || "No response received.";
       setMessages(prev => [...prev, { role: "assistant", content: text }]);
     } catch (err) {
-      setMessages(prev => [...prev, { role: "assistant", content: "⚠️ Connection error. Please try again." }]);
-    } finally {
+  setMessages(prev => [...prev, { role: "assistant", content: `⚠️ Error: ${err.message}` }]);
+} finally {
       setLoading(false);
     }
   };
