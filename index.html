@@ -4,9 +4,19 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>sparkz-app</title>
+    <title>S.P.A.R.K.Z | AI Fire & Rescue Tactics Advisor</title>
   </head>
   <body>
+    <!-- Netlify Forms detection: keeps subscriber submissions available in Netlify Forms dashboard -->
+    <form name="sparkz-subscribers" method="POST" data-netlify="true" data-netlify-honeypot="bot-field" hidden>
+      <input type="hidden" name="form-name" value="sparkz-subscribers" />
+      <input name="name" />
+      <input name="email" />
+      <input name="language" />
+      <input name="interest" />
+      <input name="source" />
+    </form>
+
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
