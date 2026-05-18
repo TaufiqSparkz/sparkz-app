@@ -37,11 +37,19 @@ Always structure your response with:
 
 Keep responses concise but thorough. Use Malaysian fire & rescue context where relevant. Always emphasize life safety above all.`;
 
+function encodeForm(data) {
+  return new URLSearchParams(data).toString();
+}
+
 export default function App() {
   const [selectedCategory, setSelectedCategory] = useState("fire");
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [showSubscribe, setShowSubscribe] = useState(false);
+  const [subscriber, setSubscriber] = useState({ name: "", email: "", language: "English", interest: "All Updates" });
+  const [subscribeStatus, setSubscribeStatus] = useState("");
+  const [subscribeLoading, setSubscribeLoading] = useState(false);
   const chatRef = useRef(null);
 
   useEffect(() => {
@@ -51,6 +59,40 @@ export default function App() {
   }, [messages, loading]);
 
   const cat = CATEGORIES.find(c => c.id === selectedCategory);
+
+  const handleSubscribe = async (e) => {
+    e.preventDefault();
+    if (!subscriber.email.trim() || subscribeLoading) return;
+
+    setSubscribeLoading(true);
+    setSubscribeStatus("");
+
+    try {
+      const formData = {
+        "form-name": "sparkz-subscribers",
+        name: subscriber.name.trim(),
+        email: subscriber.email.trim(),
+        language: subscriber.language,
+        interest: subscriber.interest,
+        source: "taufiqsparkz.com",
+      };
+
+      const response = await fetch("/", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: encodeForm(formData),
+      });
+
+      if (!response.ok) throw new Error("Subscription could not be saved. Please try again.");
+
+      setSubscribeStatus("✅ Subscription received. You will be notified when new updates are published.");
+      setSubscriber({ name: "", email: "", language: "English", interest: "All Updates" });
+    } catch (err) {
+      setSubscribeStatus(`⚠️ ${err.message}`);
+    } finally {
+      setSubscribeLoading(false);
+    }
+  };
 
   const handleSubmit = async () => {
     if (!input.trim() || loading) return;
@@ -104,7 +146,7 @@ export default function App() {
     <div style={{ display: "flex", flexDirection: "column", height: "100vh", background: "#0A0A0F", color: "#E2E8F0", fontFamily: "Courier New, monospace" }}>
 
       {/* HEADER */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 20px", borderBottom: "1px solid #FF4500", background: "rgba(255,69,0,0.05)", flexShrink: 0 }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 20px", borderBottom: "1px solid #FF4500", background: "rgba(255,69,0,0.05)", flexShrink: 0, gap: 12 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <div style={{ width: 36, height: 36, borderRadius: "50%", border: "2px solid #FF4500", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>🔥</div>
           <div>
@@ -112,11 +154,81 @@ export default function App() {
             <div style={{ fontSize: 9, color: "#64748B", letterSpacing: 2 }}>AI FIRE & RESCUE TACTICS ADVISOR</div>
           </div>
         </div>
-        <div style={{ textAlign: "right" }}>
-          <div style={{ fontSize: 9, color: "#FF4500" }}>● SYSTEM ONLINE</div>
-          <div style={{ fontSize: 9, color: "#475569" }}>by Taufiq Sparkz</div>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <button onClick={() => setShowSubscribe(prev => !prev)} style={{
+            padding: "8px 12px", borderRadius: 6, border: "1px solid #FF4500", background: "rgba(255,69,0,0.12)",
+            color: "#FFB089", cursor: "pointer", fontSize: 11, letterSpacing: 1, fontFamily: "inherit", whiteSpace: "nowrap",
+          }}>
+            🔔 SUBSCRIBE
+          </button>
+          <div style={{ textAlign: "right" }}>
+            <div style={{ fontSize: 9, color: "#FF4500" }}>● SYSTEM ONLINE</div>
+            <div style={{ fontSize: 9, color: "#475569" }}>by Taufiq Sparkz</div>
+          </div>
         </div>
       </div>
+
+      {/* SUBSCRIBE PANEL */}
+      {showSubscribe && (
+        <div style={{ padding: "12px 16px", borderBottom: "1px solid #1E293B", background: "rgba(15,23,42,0.96)", flexShrink: 0 }}>
+          <form name="sparkz-subscribers" method="POST" data-netlify="true" onSubmit={handleSubscribe}>
+            <input type="hidden" name="form-name" value="sparkz-subscribers" />
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 16, flexWrap: "wrap", marginBottom: 10 }}>
+              <div>
+                <div style={{ color: "#FF4500", fontSize: 13, fontWeight: "bold", letterSpacing: 1 }}>Subscribe to Taufiq Sparkz Updates</div>
+                <div style={{ color: "#64748B", fontSize: 10, marginTop: 3 }}>Get notified about new articles, training updates, AI tools, research notes, and website announcements.</div>
+              </div>
+              <button type="button" onClick={() => setShowSubscribe(false)} style={{ background: "transparent", border: "1px solid #334155", color: "#64748B", borderRadius: 4, padding: "4px 8px", cursor: "pointer" }}>✕</button>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 8 }}>
+              <input
+                name="name"
+                value={subscriber.name}
+                onChange={e => setSubscriber(prev => ({ ...prev, name: e.target.value }))}
+                placeholder="Name"
+                style={{ background: "rgba(30,41,59,0.7)", border: "1px solid #334155", borderRadius: 6, padding: "9px 10px", color: "#E2E8F0", fontSize: 12, fontFamily: "inherit", outline: "none" }}
+              />
+              <input
+                name="email"
+                type="email"
+                required
+                value={subscriber.email}
+                onChange={e => setSubscriber(prev => ({ ...prev, email: e.target.value }))}
+                placeholder="Email address"
+                style={{ background: "rgba(30,41,59,0.7)", border: "1px solid #334155", borderRadius: 6, padding: "9px 10px", color: "#E2E8F0", fontSize: 12, fontFamily: "inherit", outline: "none" }}
+              />
+              <select
+                name="language"
+                value={subscriber.language}
+                onChange={e => setSubscriber(prev => ({ ...prev, language: e.target.value }))}
+                style={{ background: "rgba(30,41,59,0.7)", border: "1px solid #334155", borderRadius: 6, padding: "9px 10px", color: "#E2E8F0", fontSize: 12, fontFamily: "inherit", outline: "none" }}
+              >
+                <option>Malay</option>
+                <option>English</option>
+                <option>Tagalog</option>
+              </select>
+              <select
+                name="interest"
+                value={subscriber.interest}
+                onChange={e => setSubscriber(prev => ({ ...prev, interest: e.target.value }))}
+                style={{ background: "rgba(30,41,59,0.7)", border: "1px solid #334155", borderRadius: 6, padding: "9px 10px", color: "#E2E8F0", fontSize: 12, fontFamily: "inherit", outline: "none" }}
+              >
+                <option>All Updates</option>
+                <option>Fire & Rescue</option>
+                <option>EV Safety</option>
+                <option>Training Modules</option>
+                <option>AI Tools</option>
+                <option>Research Articles</option>
+              </select>
+              <button type="submit" disabled={subscribeLoading} style={{ background: subscribeLoading ? "#1E293B" : "#FF4500", border: "none", borderRadius: 6, color: "#fff", padding: "9px 12px", cursor: subscribeLoading ? "not-allowed" : "pointer", fontSize: 12, fontFamily: "inherit", letterSpacing: 1 }}>
+                {subscribeLoading ? "SAVING..." : "SUBSCRIBE NOW"}
+              </button>
+            </div>
+            {subscribeStatus && <div style={{ color: subscribeStatus.startsWith("✅") ? "#7CFC00" : "#FFB089", fontSize: 10, marginTop: 8 }}>{subscribeStatus}</div>}
+            <div style={{ color: "#334155", fontSize: 9, marginTop: 6 }}>By subscribing, visitors agree to receive website update notifications from Taufiq Sparkz.</div>
+          </form>
+        </div>
+      )}
 
       {/* CATEGORIES */}
       <div style={{ display: "flex", gap: 6, padding: "8px 16px", borderBottom: "1px solid #1E293B", flexShrink: 0, overflowX: "auto" }}>
